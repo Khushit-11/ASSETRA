@@ -7,7 +7,6 @@ import { Card } from '../../components/common/Layout';
 import { Button } from '../../components/common/Button';
 import { 
   Search, 
-  Filter, 
   Star, 
   MapPin, 
   Heart, 
@@ -364,7 +363,13 @@ export const CategoryProducts: React.FC = () => {
                         name: product.title,
                         image: product.image,
                         price: product.price,
-                        quantity: 1
+                        quantity: 1,
+                        securityDeposit: product.securityDeposit || 5000,
+                        owner: {
+                          name: 'Product Owner',
+                          rating: 4.5,
+                          phone: '+91 9876543210'
+                        }
                       })}
                       disabled={!product.available}
                     >

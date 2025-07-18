@@ -6,6 +6,12 @@ export interface CartItem {
   image: string;
   price: number;
   quantity: number;
+  securityDeposit?: number;
+  owner?: {
+    name: string;
+    rating: number;
+    phone: string;
+  };
 }
 
 

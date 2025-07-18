@@ -114,16 +114,41 @@ const Cart: React.FC = () => {
       window.alert('Please set rental dates for all products before proceeding.');
       return;
     }
-    // Prepare products with rental info
+    
+    // Prepare products with rental info for checkout
     const productsWithRental = cart.map(item => {
       const { startDate, endDate, duration } = rentalDetails[item.id];
       const pricing = getPricing(item, duration);
-      return { ...item, startDate, endDate, duration, pricing };
+      
+      return {
+        id: item.id,
+        title: item.name,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity,
+        startDate,
+        endDate,
+        duration,
+        pricing: {
+          dailyRate: item.price,
+          rentTotal: pricing.rentTotal,
+          securityDeposit: pricing.securityDeposit,
+          total: pricing.total
+        },
+        owner: item.owner || {
+          name: 'Unknown Owner',
+          rating: 0,
+          phone: 'Not available'
+        },
+        securityDeposit: pricing.securityDeposit
+      };
     });
+
     navigate('/renter/checkout', {
       state: {
-        products: productsWithRental
-      },
+        product: productsWithRental
+      }
     });
   };
 

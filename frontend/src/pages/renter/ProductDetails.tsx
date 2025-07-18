@@ -113,12 +113,12 @@ export const ProductDetails: React.FC = () => {
       name: product.title,
       image: product.images[0],
       price: product.price,
-      quantity: 1
+      quantity: 1,
+      securityDeposit: product.securityDeposit,
+      owner: product.owner
     });
     window.alert('Added to cart!');
   };
-
-  const { rentTotal, total, days } = calculateTotal();
 
   return (
     <RenterLayout>
