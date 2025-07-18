@@ -96,7 +96,7 @@ export const AddProduct: React.FC = () => {
     }
   };
 
-  const generateTitleAndDescription = async () => {
+  const generateTitle = async () => {
     if (!isGenerateEnabled) {
       alert('Please add a product description and upload at least one image first');
       return;
@@ -104,24 +104,18 @@ export const AddProduct: React.FC = () => {
 
     setIsGenerating(true);
     
-    // Simulate AI generation
+    // Simulate AI generation for description
     setTimeout(() => {
-      const mockTitles = [
-        'Professional DSLR Camera Kit',
-        'Gaming Laptop High Performance',
-        'Fitness Equipment Set',
-        'Home Theater System',
-        'Power Tools Collection'
-      ];
-      
       const mockDescriptions = [
-        'High-quality professional equipment perfect for events and photography. Includes all necessary accessories and comes in excellent condition.',
-        'Latest generation device with premium features and outstanding performance. Ideal for both professional and personal use.',
-        'Complete set with all essential components. Well-maintained and ready for immediate use. Perfect for your needs.'
+        'This professional-grade equipment features advanced technology and premium build quality. Perfect for both commercial and personal use, it offers exceptional performance and reliability. The item is well-maintained and comes with all necessary accessories for immediate use.',
+        'High-performance device designed for demanding applications. Features cutting-edge technology with user-friendly interface. Ideal for professionals and enthusiasts alike. Excellent condition with comprehensive functionality and outstanding durability.',
+        'Premium quality item with exceptional features and modern design. Built to last with superior materials and craftsmanship. Perfect for various applications and suitable for both beginners and experts. Comes complete with essential accessories.',
+        'Advanced technology product offering superior performance and reliability. Features innovative design with practical functionality. Well-suited for professional environments and personal projects. Maintained in excellent condition for optimal performance.',
+        'High-quality equipment with professional-grade specifications. Designed for efficiency and ease of use. Perfect for specialized applications and general purpose use. Reliable performance with comprehensive feature set and durable construction.'
       ];
 
-      setValue('title', mockTitles[Math.floor(Math.random() * mockTitles.length)]);
-      setValue('description', mockDescriptions[Math.floor(Math.random() * mockDescriptions.length)]);
+      // Set the generated description
+      setValue('title', mockDescriptions[Math.floor(Math.random() * mockDescriptions.length)]);
       setIsGenerating(false);
     }, 2000);
   };
@@ -326,14 +320,14 @@ export const AddProduct: React.FC = () => {
                       <Sparkles className="w-4 h-4 mr-2 text-purple-600" />
                       AI-Powered Generation
                     </h3>
-                    <p className="text-xs text-gray-600">Generate title and description from your images</p>
+                    <p className="text-xs text-gray-600">Generate description from your images and input</p>
                     {!isGenerateEnabled && (
                       <p className="text-xs text-amber-600 mt-1">Upload images and add product description to enable generation</p>
                     )}
                   </div>
                   <Button
                     type="button"
-                    onClick={generateTitleAndDescription}
+                    onClick={generateTitle}
                     disabled={isGenerating || !isGenerateEnabled}
                     variant="secondary"
                     size="sm"
@@ -343,11 +337,17 @@ export const AddProduct: React.FC = () => {
                 </div>
               </Card>
 
-              <Input
-                label="Product Title (AI Generated)"
-                placeholder="AI will generate based on images..."
-                {...register('title')}
-              />
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  AI Generated Description
+                </label>
+                <textarea
+                  placeholder="AI will generate based on images and description..."
+                  rows={6}
+                  className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors resize-vertical"
+                  {...register('title')}
+                />
+              </div>
             </div>
 
             {/* Submit Button */}
