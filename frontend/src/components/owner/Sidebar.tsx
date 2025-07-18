@@ -8,7 +8,8 @@ import {
   User,
   Menu,
   X,
-  Users
+  Users,
+  Shield
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -25,6 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     { icon: Package, label: 'My Products', path: '/owner/my-products' },
     { icon: Activity, label: 'Rental Status', path: '/owner/rental-status' },
     { icon: Users, label: 'Rental Requests', path: '/owner/rental-requests' },
+    { icon: Shield, label: 'Damage Detection', path: '/owner/damage-detection' },
     { icon: User, label: 'My Account', path: '/owner/account' }
   ];
 

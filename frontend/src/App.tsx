@@ -15,6 +15,7 @@ import { AddProduct } from './pages/owner/AddProduct';
 import { MyProducts } from './pages/owner/MyProducts';
 import { RentalStatus } from './pages/owner/RentalStatus';
 import { RentalRequests } from './pages/owner/RentalRequests';
+import { DamageDetection } from './pages/owner/DamageDetection';
 import { ImageLog } from './pages/owner/ImageLog';
 import { Notifications } from './pages/owner/Notifications';
 import { OwnerAccount } from './pages/owner/OwnerAccount';
@@ -100,6 +101,11 @@ const AppContent: React.FC = () => {
         <Route path="/owner/rental-requests" element={
           <ProtectedRoute userType="owner">
             <RentalRequests />
+          </ProtectedRoute>
+        } />
+        <Route path="/owner/damage-detection" element={
+          <ProtectedRoute userType="owner">
+            <DamageDetection />
           </ProtectedRoute>
         } />
         <Route path="/owner/image-log" element={
