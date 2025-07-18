@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
 import { OwnerLayout } from '../../components/owner/OwnerLayout';
 import { Card } from '../../components/common/Layout';
 import { Input } from '../../components/common/Input';
@@ -8,7 +7,7 @@ import { Select } from '../../components/common/Select';
 import { Button } from '../../components/common/Button';
 import { useData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { Upload, Mic, Sparkles, Camera } from 'lucide-react';
+import { Upload, Mic, Sparkles } from 'lucide-react';
 
 interface ProductForm {
   category: string;
@@ -32,6 +31,12 @@ export const AddProduct: React.FC = () => {
       language: 'english'
     }
   });
+
+  // Watch form values to enable/disable generate button
+  const watchedValues = watch(['description']);
+  const [description] = watchedValues;
+  
+  const isGenerateEnabled = description && description.trim().length > 0 && uploadedImages.length > 0;
 
   const categories = [
     { value: 'electronics', label: 'Electronics' },
@@ -70,8 +75,8 @@ export const AddProduct: React.FC = () => {
   };
 
   const generateTitleAndDescription = async () => {
-    if (uploadedImages.length === 0) {
-      alert('Please upload at least one image first');
+    if (!isGenerateEnabled) {
+      alert('Please add a product description and upload at least one image first');
       return;
     }
 
@@ -196,28 +201,6 @@ export const AddProduct: React.FC = () => {
               )}
             </div>
 
-            {/* AI Generation Section */}
-            <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 flex items-center">
-                    <Sparkles className="w-4 h-4 mr-2 text-purple-600" />
-                    AI-Powered Generation
-                  </h3>
-                  <p className="text-xs text-gray-600">Generate title and description from your images</p>
-                </div>
-                <Button
-                  type="button"
-                  onClick={generateTitleAndDescription}
-                  disabled={isGenerating || uploadedImages.length === 0}
-                  variant="secondary"
-                  size="sm"
-                >
-                  {isGenerating ? 'Generating...' : 'Generate'}
-                </Button>
-              </div>
-            </Card>
-
             {/* Category and Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Select
@@ -268,12 +251,6 @@ export const AddProduct: React.FC = () => {
 
             {/* Title and Description */}
             <div className="space-y-4">
-              <Input
-                label="Product Title (AI Generated)"
-                placeholder="AI will generate based on images..."
-                {...register('title')}
-              />
-
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">
@@ -305,6 +282,37 @@ export const AddProduct: React.FC = () => {
                   <p className="text-sm text-red-600 mt-1">Listening... Speak now</p>
                 )}
               </div>
+
+              {/* AI Generation Section */}
+              <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 flex items-center">
+                      <Sparkles className="w-4 h-4 mr-2 text-purple-600" />
+                      AI-Powered Generation
+                    </h3>
+                    <p className="text-xs text-gray-600">Generate title and description from your images</p>
+                    {!isGenerateEnabled && (
+                      <p className="text-xs text-amber-600 mt-1">Upload images and add product description to enable generation</p>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={generateTitleAndDescription}
+                    disabled={isGenerating || !isGenerateEnabled}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    {isGenerating ? 'Generating...' : 'Generate'}
+                  </Button>
+                </div>
+              </Card>
+
+              <Input
+                label="Product Title (AI Generated)"
+                placeholder="AI will generate based on images..."
+                {...register('title')}
+              />
             </div>
 
             {/* Submit Button */}
