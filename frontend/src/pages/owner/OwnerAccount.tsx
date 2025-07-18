@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { OwnerLayout } from '../../components/owner/OwnerLayout';
 import { Card } from '../../components/common/Layout';
 import { 
@@ -24,6 +25,7 @@ type AccountSection = 'profile' | 'security' | 'notifications' | 'billing' | 'ch
 
 export const OwnerAccount: React.FC = () => {
   const { logout } = useAuth();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [activeSection, setActiveSection] = useState<AccountSection>('profile');
   const [notifications, setNotifications] = useState({
@@ -32,6 +34,13 @@ export const OwnerAccount: React.FC = () => {
     pushNotifications: true,
     marketingEmails: false
   });
+
+  // Handle navigation from dashboard
+  useEffect(() => {
+    if (location.state?.activeSection) {
+      setActiveSection(location.state.activeSection);
+    }
+  }, [location.state]);
 
   const handleNotificationChange = (key: keyof typeof notifications) => {
     setNotifications(prev => ({

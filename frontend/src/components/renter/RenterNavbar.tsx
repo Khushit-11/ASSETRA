@@ -24,7 +24,7 @@ export const RenterNavbar: React.FC<RenterNavbarProps> = ({ onChatToggle }) => {
     { icon: Home, label: 'Home', path: '/renter/home' },
     { icon: Package, label: 'My Rentals', path: '/renter/rentals' },
     { icon: MapPin, label: 'Addresses', path: '/renter/addresses' },
-    { icon: User, label: 'Account', path: '/renter/account' },
+    { icon: User, label: 'My Account', path: '/renter/account' },
     { icon: ShoppingCart, label: 'My Cart', path: '/renter/cart' }
     
   ];
