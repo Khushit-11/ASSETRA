@@ -20,10 +20,8 @@ import {
   ShoppingCart,
   Package
 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
 
 export const RenterHome: React.FC = () => {
-  const { user, isLoading } = useAuth();
   const [showChat, setShowChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showRentModal, setShowRentModal] = useState(false);
@@ -193,7 +191,9 @@ export const RenterHome: React.FC = () => {
   const calculateTotal = () => {
     if (!selectedProduct) return { rentTotal: 0, total: 0, days: selectedDuration };
     const days = selectedDuration;
-    const price = parseInt(selectedProduct.price.replace(/[^0-9]/g, ''));
+    const price = typeof selectedProduct.price === 'string' 
+      ? parseInt(selectedProduct.price.replace(/[^0-9]/g, '')) 
+      : selectedProduct.price;
     const securityDeposit = selectedProduct.securityDeposit || 5000;
     const rentTotal = price * days;
     const total = rentTotal + securityDeposit;
@@ -205,20 +205,32 @@ export const RenterHome: React.FC = () => {
       alert('Please select rental dates');
       return;
     }
+    
+    const { rentTotal, total, days } = calculateTotal();
+    
     setShowRentModal(false);
     navigate('/renter/checkout', {
       state: {
         product: selectedProduct,
         startDate,
         endDate,
-        duration: selectedDuration,
-        pricing: calculateTotal()
+        duration: days,
+        pricing: {
+          dailyRate: typeof selectedProduct.price === 'string' 
+            ? parseInt(selectedProduct.price.replace(/[^0-9]/g, '')) 
+            : selectedProduct.price,
+          rentTotal,
+          securityDeposit: selectedProduct.securityDeposit || 5000,
+          total
+        },
+        owner: selectedProduct.owner || {
+          name: 'Unknown Owner',
+          rating: 0,
+          phone: 'Not available'
+        }
       }
     });
   };
-
-  if (isLoading) return <div>Loading...</div>;
-  if (!user) return <div>Unauthorized. Please log in.</div>;
 
   return (
     <RenterLayout onChatToggle={() => setShowChat(!showChat)}>
@@ -276,8 +288,8 @@ export const RenterHome: React.FC = () => {
               </div>
               <div className="bg-gray-50 rounded-lg p-4 space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span>Rent (₹{selectedProduct.price} × {selectedDuration} days)</span>
-                  <span>₹{parseInt(selectedProduct.price.replace(/[^0-9]/g, '')) * selectedDuration}</span>
+                  <span>Rent (₹{typeof selectedProduct.price === 'number' ? selectedProduct.price : parseInt(selectedProduct.price.replace(/[^0-9]/g, ''))} × {selectedDuration} days)</span>
+                  <span>₹{(typeof selectedProduct.price === 'number' ? selectedProduct.price : parseInt(selectedProduct.price.replace(/[^0-9]/g, ''))) * selectedDuration}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Security Deposit</span>
@@ -285,7 +297,7 @@ export const RenterHome: React.FC = () => {
                 </div>
                 <div className="border-t pt-2 flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>₹{(parseInt(selectedProduct.price.replace(/[^0-9]/g, '')) * selectedDuration) + (selectedProduct.securityDeposit || 5000)}</span>
+                  <span>₹{((typeof selectedProduct.price === 'number' ? selectedProduct.price : parseInt(selectedProduct.price.replace(/[^0-9]/g, ''))) * selectedDuration) + (selectedProduct.securityDeposit || 5000)}</span>
                 </div>
                 <p className="text-xs text-gray-600">
                   *Security deposit will be refunded after return
@@ -297,6 +309,8 @@ export const RenterHome: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Rest of the component remains exactly the same */}
         {/* Search Bar */}
         <Card className="p-4">
           <div className="relative">
@@ -386,11 +400,9 @@ export const RenterHome: React.FC = () => {
                       <h3 className="font-semibold text-gray-900 mb-1">{product.title}</h3>
                       <p className="text-emerald-600 font-bold mb-1">{product.price}</p>
                       <p className="text-xs text-blue-600 mb-2">{product.reason}</p>
-                      <Button size="sm" className="w-full">
-                        <Button size="sm" className="w-full" onClick={() => handleRentNowClick(product)}>
-                          <ShoppingCart className="w-4 h-4 mr-1" />
-                          Rent Now
-                        </Button>
+                      <Button size="sm" className="w-full" onClick={() => handleRentNowClick(product)}>
+                        <ShoppingCart className="w-4 h-4 mr-1" />
+                        Rent Now
                       </Button>
                     </div>
                   </div>
@@ -443,8 +455,8 @@ export const RenterHome: React.FC = () => {
                     
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-lg font-bold text-emerald-600">{product.price}</p>
-                        <p className="text-xs text-gray-500 line-through">{product.originalPrice}</p>
+                        <p className="text-lg font-bold text-emerald-600">₹{product.price}/day</p>
+                        <p className="text-xs text-gray-500 line-through">₹{product.originalPrice}</p>
                       </div>
                       <div className="text-right">
                         <div className="flex items-center text-xs text-gray-500">
@@ -480,11 +492,11 @@ export const RenterHome: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {['Gaming Chair', 'WiFi Router', 'Projector', 'Sound System'].map((item, index) => (
               <Card key={item} className="p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
-            <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
-              <Package className="w-8 h-8 text-gray-400" />
-            </div>
-            <p className="text-sm font-medium text-gray-900">{item}</p>
-            <p className="text-xs text-gray-500">From ₹{(index + 1) * 100}/day</p>
+                <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                  <Package className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-sm font-medium text-gray-900">{item}</p>
+                <p className="text-xs text-gray-500">From ₹{(index + 1) * 100}/day</p>
               </Card>
             ))}
           </div>

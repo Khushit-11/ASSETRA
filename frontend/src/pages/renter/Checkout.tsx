@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { RenterLayout } from '../../components/renter/RenterLayout';
 import { Card } from '../../components/common/Layout';
 import { Button } from '../../components/common/Button';
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Calendar, 
+import {
+  ArrowLeft,
+  Calendar,
   CreditCard,
   Smartphone,
   Banknote,
@@ -19,14 +17,13 @@ import {
 export const Checkout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  // Accept multiple products
-  const { products = [] } = location.state || {};
+  const { product } = location.state || {};
+  const products = Array.isArray(product) ? product : [product]; // Ensure array
 
   const [selectedAddress, setSelectedAddress] = useState('1');
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Mock addresses
   const addresses = [
     {
       id: '1',
@@ -48,7 +45,7 @@ export const Checkout: React.FC = () => {
     { id: 'cod', label: 'Cash on Delivery', icon: Banknote, description: 'Pay when item is delivered' }
   ];
 
-  if (!products.length) {
+  if (!Array.isArray(products) || products.length === 0) {
     return (
       <RenterLayout>
         <div className="text-center py-12">
@@ -76,15 +73,17 @@ export const Checkout: React.FC = () => {
     }, 2000);
   };
 
+  const totalAmount = products.reduce(
+    (sum, item) => sum + (item.pricing?.total || 0),
+    0
+  );
+
   return (
     <RenterLayout>
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 rounded-lg hover:bg-gray-100"
-          >
+          <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-gray-100">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold text-gray-900">Checkout</h1>
@@ -94,15 +93,17 @@ export const Checkout: React.FC = () => {
         <Card className="p-4">
           <h3 className="font-semibold text-gray-900 mb-2">Order Summary</h3>
           <div className="flex flex-col gap-4">
-            {products.map((item: any, idx: number) => (
+            {products.map((item, idx) => (
               <div key={item.id || idx} className="flex space-x-4 border-b pb-3 last:border-b-0 last:pb-0">
                 <img
-                  src={item.image || (item.images && item.images[0])}
+                  src={item.image || (item.images?.[0])}
                   alt={item.name || item.title}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">{item.name || item.title}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    {item.name || item.title}
+                  </h3>
                   <div className="flex items-center space-x-4 text-sm text-gray-600">
                     <span className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
@@ -110,7 +111,9 @@ export const Checkout: React.FC = () => {
                     </span>
                     <span>{item.duration} days</span>
                   </div>
-                  <p className="text-emerald-600 font-semibold mt-1">₹{item.price}/day</p>
+                  <p className="text-emerald-600 font-semibold mt-1">
+                    ₹{item.price}/day
+                  </p>
                 </div>
               </div>
             ))}
@@ -140,11 +143,13 @@ export const Checkout: React.FC = () => {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3">
-                    <div className={`w-4 h-4 rounded-full border-2 mt-1 ${
-                      selectedAddress === address.id
-                        ? 'border-emerald-500 bg-emerald-500'
-                        : 'border-gray-300'
-                    }`}>
+                    <div
+                      className={`w-4 h-4 rounded-full border-2 mt-1 ${
+                        selectedAddress === address.id
+                          ? 'border-emerald-500 bg-emerald-500'
+                          : 'border-gray-300'
+                      }`}
+                    >
                       {selectedAddress === address.id && (
                         <Check className="w-2 h-2 text-white m-0.5" />
                       )}
@@ -173,7 +178,6 @@ export const Checkout: React.FC = () => {
         {/* Payment Method */}
         <Card className="p-4">
           <h3 className="font-semibold text-gray-900 mb-4">Payment Method</h3>
-
           <div className="space-y-3">
             {paymentMethods.map((method) => {
               const Icon = method.icon;
@@ -213,15 +217,15 @@ export const Checkout: React.FC = () => {
         <Card className="p-4">
           <h3 className="font-semibold text-gray-900 mb-4">Price Details</h3>
           <div className="space-y-3">
-            {products.map((item: any, idx: number) => (
+            {products.map((item, idx) => (
               <div key={item.id || idx} className="mb-2 border-b pb-2 last:border-b-0 last:pb-0">
                 <div className="flex justify-between text-sm">
                   <span>{item.name || item.title} (₹{item.price} × {item.duration} days)</span>
-                  <span>₹{item.pricing.rentTotal}</span>
+                  <span>₹{item.pricing?.rentTotal}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Security Deposit</span>
-                  <span>₹{item.pricing.securityDeposit}</span>
+                  <span>₹{item.pricing?.securityDeposit}</span>
                 </div>
               </div>
             ))}
@@ -231,7 +235,7 @@ export const Checkout: React.FC = () => {
             </div>
             <div className="border-t pt-3 flex justify-between font-semibold text-lg">
               <span>Total Amount</span>
-              <span>₹{products.reduce((sum: number, item: any) => sum + (item.pricing?.total || 0), 0)}</span>
+              <span>₹{totalAmount}</span>
             </div>
             <p className="text-xs text-gray-600">
               *Security deposit will be refunded after successful return
@@ -269,11 +273,10 @@ export const Checkout: React.FC = () => {
             className="w-full"
             size="lg"
           >
-            {isProcessing ? 'Processing...' : `Place Order • ₹${products.reduce((sum: number, item: any) => sum + (item.pricing?.total || 0), 0)}`}
+            {isProcessing ? 'Processing...' : `Place Order • ₹${totalAmount}`}
           </Button>
         </div>
 
-        {/* Bottom spacing for mobile */}
         <div className="h-20 lg:hidden"></div>
       </div>
     </RenterLayout>
