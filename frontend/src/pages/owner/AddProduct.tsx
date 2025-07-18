@@ -21,6 +21,9 @@ interface ProductForm {
 }
 
 export const AddProduct: React.FC = () => {
+  // Mistral API key (NOTE: In production, use environment variables)
+  const MISTRAL_API_KEY = 'RmVklbrpC36qrge8VomtXGxYWJSIG0Oq';
+
   const { user } = useAuth();
   const { addProduct, updateProduct } = useData();
   const location = useLocation();
@@ -51,7 +54,7 @@ export const AddProduct: React.FC = () => {
   const watchedValues = watch(['description']);
   const [description] = watchedValues;
   
-  const isGenerateEnabled = description && description.trim().length > 0 && uploadedImages.length > 0;
+  const isGenerateEnabled = description && description.trim().length > 0;
 
   // Set images when editing
   useEffect(() => {
@@ -96,28 +99,96 @@ export const AddProduct: React.FC = () => {
     }
   };
 
-  const generateTitle = async () => {
+  const generateWithMistral = async (prompt: string) => {
+    try {
+      const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${MISTRAL_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'mistral-tiny',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Mistral API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0]?.message?.content || '';
+    } catch (error) {
+      console.error('Error calling Mistral API:', error);
+      throw error;
+    }
+  };
+
+  const generateTitleAndDescription = async () => {
     if (!isGenerateEnabled) {
-      alert('Please add a product description and upload at least one image first');
+      alert('Please add a product description first');
       return;
     }
 
     setIsGenerating(true);
     
-    // Simulate AI generation for description
-    setTimeout(() => {
-      const mockDescriptions = [
-        'This professional-grade equipment features advanced technology and premium build quality. Perfect for both commercial and personal use, it offers exceptional performance and reliability. The item is well-maintained and comes with all necessary accessories for immediate use.',
-        'High-performance device designed for demanding applications. Features cutting-edge technology with user-friendly interface. Ideal for professionals and enthusiasts alike. Excellent condition with comprehensive functionality and outstanding durability.',
-        'Premium quality item with exceptional features and modern design. Built to last with superior materials and craftsmanship. Perfect for various applications and suitable for both beginners and experts. Comes complete with essential accessories.',
-        'Advanced technology product offering superior performance and reliability. Features innovative design with practical functionality. Well-suited for professional environments and personal projects. Maintained in excellent condition for optimal performance.',
-        'High-quality equipment with professional-grade specifications. Designed for efficiency and ease of use. Perfect for specialized applications and general purpose use. Reliable performance with comprehensive feature set and durable construction.'
-      ];
+    try {
+      // Create a detailed prompt for Mistral
+      const userDescription = watch('description') || '';
+      const category = watch('category') || '';
+      const language = watch('language') || 'english';
+      const rentPrice = watch('rentPrice') || 0;
+      const securityAmount = watch('securityAmount') || 0;
+      
+      const prompt = `
+      You are an expert product description generator for a rental platform. 
+      Create a compelling product title and detailed description in ${language} based on the following information:
+      
+      Product Details:
+      - Category: ${categories.find(c => c.value === category)?.label || category}
+      - Daily Rent Price: ₹${rentPrice}
+      - Security Deposit: ₹${securityAmount}
+      - User's description: "${userDescription}"
+      
+      Guidelines:
+      1. Generate a professional product title (max 10 words)
+      2. Create a detailed description (150-200 words) with:
+         - Key features and specifications
+         - Benefits for renters
+         - Condition and quality assessment
+         - Rental terms and usage suggestions
+         - Safety and maintenance information
+      3. Make it appealing for potential renters
+      4. Use markdown formatting with **bold** for important features
+      5. Include emojis where appropriate to enhance readability
+      6. Structure the description with clear paragraphs
+      
+      Output format:
+      Title: [generated title here]
+      Description: [generated description here]
+      `;
 
-      // Set the generated description
-      setValue('title', mockDescriptions[Math.floor(Math.random() * mockDescriptions.length)]);
+      const result = await generateWithMistral(prompt);
+      
+      // Parse the response
+      const titleMatch = result.match(/Title:\s*(.*)/);
+      const descriptionMatch = result.match(/Description:\s*([\s\S]*)/);
+      
+      if (titleMatch && titleMatch[1]) {
+        setValue('title', titleMatch[1].trim());
+      }
+      
+      if (descriptionMatch && descriptionMatch[1]) {
+        setValue('description', descriptionMatch[1].trim());
+      }
+    } catch (error) {
+      alert('Failed to generate content. Please try again.');
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const startVoiceInput = () => {
@@ -320,32 +391,38 @@ export const AddProduct: React.FC = () => {
                       <Sparkles className="w-4 h-4 mr-2 text-purple-600" />
                       AI-Powered Generation
                     </h3>
-                    <p className="text-xs text-gray-600">Generate description from your images and input</p>
+                    <p className="text-xs text-gray-600">Generate professional title and description</p>
                     {!isGenerateEnabled && (
-                      <p className="text-xs text-amber-600 mt-1">Upload images and add product description to enable generation</p>
+                      <p className="text-xs text-amber-600 mt-1">Add product description to enable generation</p>
                     )}
                   </div>
                   <Button
                     type="button"
-                    onClick={generateTitle}
+                    onClick={generateTitleAndDescription}
                     disabled={isGenerating || !isGenerateEnabled}
                     variant="secondary"
                     size="sm"
                   >
-                    {isGenerating ? 'Generating...' : 'Generate'}
+                    {isGenerating ? 'Generating...' : 'Generate with AI'}
                   </Button>
                 </div>
               </Card>
 
+              <Input
+                label="Product Title"
+                placeholder="AI will generate based on your description..."
+                {...register('title')}
+              />
+
               <div className="space-y-1">
                 <label className="block text-sm font-medium text-gray-700">
-                  AI Generated Description
+                  Product Description
                 </label>
                 <textarea
-                  placeholder="AI will generate based on images and description..."
+                  placeholder="AI will enhance your description..."
                   rows={6}
                   className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-colors resize-vertical"
-                  {...register('title')}
+                  {...register('description')}
                 />
               </div>
             </div>
@@ -356,7 +433,7 @@ export const AddProduct: React.FC = () => {
                 Save as Draft
               </Button>
               <Button type="submit" size="lg">
-                Post Product
+                {isEditing ? 'Update Product' : 'Post Product'}
               </Button>
             </div>
           </form>
