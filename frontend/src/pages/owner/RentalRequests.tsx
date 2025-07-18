@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { OwnerLayout } from '../../components/owner/OwnerLayout';
 import { Card } from '../../components/common/Layout';
 import { 
@@ -13,8 +13,23 @@ import {
   Eye
 } from 'lucide-react';
 
+type RentalRequest = {
+  id: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  productName: string;
+  requestDate: string;
+  startDate: string;
+  endDate: string;
+  duration: string;
+  totalAmount: string;
+  status: 'pending' | 'approved' | 'rejected';
+  location: string;
+};
+
 export const RentalRequests: React.FC = () => {
-  const rentalRequests = [
+  const [rentalRequests, setRentalRequests] = useState<RentalRequest[]>([
     {
       id: 1,
       customerName: 'Rahul Sharma',
@@ -57,7 +72,37 @@ export const RentalRequests: React.FC = () => {
       status: 'rejected',
       location: 'Delhi, India'
     }
-  ];
+  ]);
+
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+
+  const filteredRequests = rentalRequests.filter(request => 
+    statusFilter === 'all' || request.status === statusFilter
+  );
+
+  const handleApprove = (requestId: number) => {
+    setRentalRequests(prev => 
+      prev.map(request => 
+        request.id === requestId 
+          ? { ...request, status: 'approved' as const }
+          : request
+      )
+    );
+    // You could add a toast notification here
+    console.log(`Request ${requestId} approved successfully!`);
+  };
+
+  const handleReject = (requestId: number) => {
+    setRentalRequests(prev => 
+      prev.map(request => 
+        request.id === requestId 
+          ? { ...request, status: 'rejected' as const }
+          : request
+      )
+    );
+    // You could add a toast notification here
+    console.log(`Request ${requestId} rejected successfully!`);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -147,10 +192,59 @@ export const RentalRequests: React.FC = () => {
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Recent Requests</h3>
+            
+            {/* Status Filter */}
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setStatusFilter('all')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  statusFilter === 'all'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                All ({rentalRequests.length})
+              </button>
+              <button
+                onClick={() => setStatusFilter('pending')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  statusFilter === 'pending'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Pending ({rentalRequests.filter(r => r.status === 'pending').length})
+              </button>
+              <button
+                onClick={() => setStatusFilter('approved')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  statusFilter === 'approved'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Approved ({rentalRequests.filter(r => r.status === 'approved').length})
+              </button>
+              <button
+                onClick={() => setStatusFilter('rejected')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  statusFilter === 'rejected'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Rejected ({rentalRequests.filter(r => r.status === 'rejected').length})
+              </button>
+            </div>
           </div>
 
           <div className="space-y-4">
-            {rentalRequests.map((request) => (
+            {filteredRequests.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>No requests found for the selected filter.</p>
+              </div>
+            ) : (
+              filteredRequests.map((request) => (
               <div key={request.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-4">
@@ -199,10 +293,16 @@ export const RentalRequests: React.FC = () => {
                   
                   {request.status === 'pending' && (
                     <div className="flex space-x-2">
-                      <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+                      <button 
+                        onClick={() => handleApprove(request.id)}
+                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                      >
                         Approve
                       </button>
-                      <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      <button 
+                        onClick={() => handleReject(request.id)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                      >
                         Reject
                       </button>
                       <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
@@ -210,9 +310,32 @@ export const RentalRequests: React.FC = () => {
                       </button>
                     </div>
                   )}
+                  
+                  {request.status === 'approved' && (
+                    <div className="flex space-x-2">
+                      <div className="px-4 py-2 bg-green-50 text-green-700 rounded-lg font-medium">
+                        ✓ Approved
+                      </div>
+                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {request.status === 'rejected' && (
+                    <div className="flex space-x-2">
+                      <div className="px-4 py-2 bg-red-50 text-red-700 rounded-lg font-medium">
+                        ✗ Rejected
+                      </div>
+                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </Card>
       </div>

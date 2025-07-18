@@ -21,13 +21,13 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
-type AccountSection = 'profile' | 'security' | 'notifications' | 'billing' | 'change-password' | 'notification-preferences' | 'help' | 'transactions';
+type AccountSection = 'profile' | 'security' | 'notifications' | 'billing' | 'change-password' | 'notification-preferences' | 'help' | 'transactions' | null;
 
 export const OwnerAccount: React.FC = () => {
   const { logout } = useAuth();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
-  const [activeSection, setActiveSection] = useState<AccountSection>('profile');
+  const [activeSection, setActiveSection] = useState<AccountSection>(null);
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -191,6 +191,51 @@ export const OwnerAccount: React.FC = () => {
 
           {/* Account Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Default Welcome Section */}
+            {activeSection === null && (
+              <Card className="p-8">
+                <div className="text-center">
+                  <div className="bg-emerald-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <User className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Welcome to My Account</h3>
+                  <p className="text-gray-600 mb-6">
+                    Manage your account settings, security preferences, and more. 
+                    Select an option from the menu on the left to get started.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <button
+                      onClick={() => setActiveSection('profile')}
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <User className="w-6 h-6 text-emerald-600 mb-2" />
+                      <h4 className="font-medium text-gray-900">Profile Information</h4>
+                      <p className="text-sm text-gray-600">Update your personal details</p>
+                    </button>
+                    
+                    <button
+                      onClick={() => setActiveSection('security')}
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <Shield className="w-6 h-6 text-emerald-600 mb-2" />
+                      <h4 className="font-medium text-gray-900">Security</h4>
+                      <p className="text-sm text-gray-600">Manage passwords and security</p>
+                    </button>
+                    
+                    <button
+                      onClick={() => setActiveSection('notification-preferences')}
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <Bell className="w-6 h-6 text-emerald-600 mb-2" />
+                      <h4 className="font-medium text-gray-900">Notifications</h4>
+                      <p className="text-sm text-gray-600">Configure notification settings</p>
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            )}
+            
             {/* Profile Information */}
             {activeSection === 'profile' && (
               <Card className="p-6">
