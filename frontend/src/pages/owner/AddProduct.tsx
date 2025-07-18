@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { OwnerLayout } from '../../components/owner/OwnerLayout';
 import { Card } from '../../components/common/Layout';
 import { Input } from '../../components/common/Input';
@@ -21,14 +22,28 @@ interface ProductForm {
 
 export const AddProduct: React.FC = () => {
   const { user } = useAuth();
-  const { addProduct } = useData();
+  const { addProduct, updateProduct } = useData();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isListening, setIsListening] = useState(false);
 
+  // Get product data if editing
+  const editProduct = location.state?.editProduct;
+  const isEditing = !!editProduct;
+
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ProductForm>({
     defaultValues: {
-      language: 'english'
+      language: 'english',
+      ...(editProduct && {
+        category: editProduct.category,
+        quantity: editProduct.quantity,
+        rentPrice: editProduct.rentPrice,
+        securityAmount: editProduct.securityAmount,
+        title: editProduct.title,
+        description: editProduct.description
+      })
     }
   });
 
@@ -37,6 +52,13 @@ export const AddProduct: React.FC = () => {
   const [description] = watchedValues;
   
   const isGenerateEnabled = description && description.trim().length > 0 && uploadedImages.length > 0;
+
+  // Set images when editing
+  useEffect(() => {
+    if (editProduct && editProduct.images) {
+      setUploadedImages(editProduct.images);
+    }
+  }, [editProduct]);
 
   const categories = [
     { value: 'electronics', label: 'Electronics' },
@@ -129,7 +151,7 @@ export const AddProduct: React.FC = () => {
 
     if (!user) return;
 
-    addProduct({
+    const productData = {
       ownerId: user.id,
       title: data.title || 'Untitled Product',
       description: data.description || '',
@@ -139,20 +161,33 @@ export const AddProduct: React.FC = () => {
       availableQuantity: data.quantity,
       rentPrice: data.rentPrice,
       securityAmount: data.securityAmount,
-      status: 'available'
-    });
+      status: 'available' as const
+    };
 
-    alert('Product added successfully!');
-    // Reset form
-    setUploadedImages([]);
+    if (isEditing && editProduct) {
+      // Update existing product
+      updateProduct(editProduct.id, productData);
+      alert('Product updated successfully!');
+      navigate('/owner/my-products');
+    } else {
+      // Add new product
+      addProduct(productData);
+      alert('Product added successfully!');
+      // Reset form
+      setUploadedImages([]);
+    }
   };
 
   return (
     <OwnerLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
-          <p className="text-gray-600">List your items for rent with AI-powered assistance</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isEditing ? 'Edit Product' : 'Add New Product'}
+          </h1>
+          <p className="text-gray-600">
+            {isEditing ? 'Update your product details with AI-powered assistance' : 'List your items for rent with AI-powered assistance'}
+          </p>
         </div>
 
         <Card className="p-6">

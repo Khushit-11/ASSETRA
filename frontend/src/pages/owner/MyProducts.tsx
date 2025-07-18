@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { OwnerLayout } from '../../components/owner/OwnerLayout';
 import { Card } from '../../components/common/Layout';
 import { Button } from '../../components/common/Button';
 import { useData } from '../../contexts/DataContext';
-import { Edit, Trash2, Eye, MoreVertical } from 'lucide-react';
+import { Edit, Trash2, Eye, MoreVertical, X } from 'lucide-react';
 
 export const MyProducts: React.FC = () => {
   const { products, updateProduct, deleteProduct } = useData();
   const [filter, setFilter] = useState('all');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const filteredProducts = products.filter(product => {
     if (filter === 'all') return true;
@@ -22,8 +26,17 @@ export const MyProducts: React.FC = () => {
   };
 
   const handleEdit = (productId: string) => {
-    // Navigate to edit page or open modal
-    console.log('Edit product:', productId);
+    navigate('/owner/add-product', { state: { editProduct: products.find(p => p.id === productId) } });
+  };
+
+  const handleViewImage = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setIsImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setSelectedImage(null);
   };
 
   const handleDelete = (productId: string) => {
@@ -134,7 +147,7 @@ export const MyProducts: React.FC = () => {
                       Edit
                     </Button>
                     <Button
-                      onClick={() => console.log('View details')}
+                      onClick={() => handleViewImage(product.images[0])}
                       variant="secondary"
                       size="sm"
                     >
@@ -181,6 +194,34 @@ export const MyProducts: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Image Modal */}
+      {isImageModalOpen && selectedImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+          onClick={closeImageModal}
+        >
+          <div 
+            className="relative max-w-4xl max-h-full bg-white rounded-lg overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeImageModal}
+              className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white/90 transition-colors"
+            >
+              <X className="w-6 h-6 text-gray-800" />
+            </button>
+
+            {/* Image */}
+            <img
+              src={selectedImage}
+              alt="Product"
+              className="w-full h-auto max-h-screen object-contain"
+            />
+          </div>
+        </div>
+      )}
     </OwnerLayout>
   );
 };

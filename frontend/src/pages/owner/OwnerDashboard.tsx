@@ -9,20 +9,16 @@ import {
   Package, 
   DollarSign, 
   Activity,
-  Bell,
   Eye,
   Plus,
   Users,
   TrendingUp,
-  ArrowRight,
-  TrendingDown,
-  Calendar,
-  CreditCard
+  ArrowRight
 } from 'lucide-react';
 
 export const OwnerDashboard: React.FC = () => {
   const { user, isLoading } = useAuth();
-  const { products = [], notifications = [] } = useData?.() || {};
+  const { products = [] } = useData?.() || {};
   const navigate = useNavigate();
 
   if (isLoading) return <div className="flex items-center justify-center h-screen"><p className="text-lg text-gray-600">Loading...</p></div>;
@@ -136,21 +132,11 @@ export const OwnerDashboard: React.FC = () => {
     <OwnerLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Welcome back, {user?.name}!
-            </h1>
-            <p className="text-gray-600">Here's what's happening with your rentals</p>
-          </div>
-          <div className="relative">
-            <Bell className="w-6 h-6 text-gray-400" />
-            {notifications.filter(n => !n.read).length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {notifications.filter(n => !n.read).length}
-              </span>
-            )}
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back, {user?.name}!
+          </h1>
+          <p className="text-gray-600">Here's what's happening with your rentals</p>
         </div>
 
         {/* Stats Grid */}
@@ -202,8 +188,8 @@ export const OwnerDashboard: React.FC = () => {
         </div>
 
         {/* Monthly Revenue Insights */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="p-6 lg:col-span-2">
+        <div className="grid grid-cols-1 gap-6">
+          <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Revenue Breakdown</h3>
               <button 
@@ -214,7 +200,7 @@ export const OwnerDashboard: React.FC = () => {
                 <ArrowRight className="w-4 h-4 ml-1" />
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -251,61 +237,6 @@ export const OwnerDashboard: React.FC = () => {
                   ₹{products.reduce((total, product) => total + (product.rentPrice * 30), 0).toLocaleString()}
                 </span>
               </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Revenue Actions</h3>
-            <div className="space-y-3">
-              <button 
-                onClick={() => navigate('/owner/my-products')}
-                className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <Package className="w-5 h-5 text-emerald-600" />
-                  <span className="text-sm font-medium">Optimize Pricing</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-              </button>
-              
-              <button 
-                onClick={() => navigate('/owner/add-product')}
-                className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <Plus className="w-5 h-5 text-emerald-600" />
-                  <span className="text-sm font-medium">Add New Product</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-              </button>
-              
-              <button 
-                onClick={() => navigate('/owner/rental-requests')}
-                className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <Users className="w-5 h-5 text-emerald-600" />
-                  <span className="text-sm font-medium">Review Requests</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-              </button>
-            </div>
-
-            <div className="mt-6 p-4 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-lg text-white">
-              <div className="flex items-center space-x-2 mb-2">
-                <TrendingUp className="w-5 h-5" />
-                <span className="font-medium">Revenue Goal</span>
-              </div>
-              <p className="text-sm opacity-90">Monthly Target: ₹25,000</p>
-              <div className="mt-2 w-full bg-white/20 rounded-full h-2">
-                <div 
-                  className="bg-white rounded-full h-2 transition-all duration-300"
-                  style={{ width: `${Math.min((monthlyRevenue / 25000) * 100, 100)}%` }}
-                ></div>
-              </div>
-              <p className="text-xs mt-1 opacity-90">
-                {Math.round((monthlyRevenue / 25000) * 100)}% completed
-              </p>
             </div>
           </Card>
         </div>
