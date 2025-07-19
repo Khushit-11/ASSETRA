@@ -16,7 +16,8 @@ import {
   Home as HomeIcon,
   Building,
   User,
-  Check
+  Check,
+  CheckCircle
 } from 'lucide-react';
 
 interface AddressForm {
@@ -35,36 +36,12 @@ export const AddressManagement: React.FC = () => {
   const { addresses, addAddress, updateAddress, deleteAddress } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<AddressForm>();
 
-  // Mock addresses since we don't have real data
-  const mockAddresses = [
-    {
-      id: '1',
-      userId: user?.id || '1',
-      label: 'Home',
-      country: 'India',
-      city: 'Mumbai',
-      pincode: '400001',
-      addressLine1: '123 Main Street',
-      addressLine2: 'Near Central Mall',
-      landmark: 'Opposite Metro Station',
-      isDefault: true
-    },
-    {
-      id: '2',
-      userId: user?.id || '1',
-      label: 'Office',
-      country: 'India',
-      city: 'Mumbai',
-      pincode: '400051',
-      addressLine1: '456 Business Park',
-      addressLine2: 'Tower A, Floor 12',
-      landmark: 'Next to Coffee Shop',
-      isDefault: false
-    }
-  ];
+  // Get user's addresses (filter by current user)
+  const userAddresses = addresses.filter(addr => addr.userId === (user?.id || '1'));
 
   const addressLabels = [
     { value: 'home', label: 'Home' },
@@ -81,12 +58,16 @@ export const AddressManagement: React.FC = () => {
   const onSubmit = (data: AddressForm) => {
     if (editingAddress) {
       updateAddress(editingAddress, { ...data, isDefault: false });
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
     } else {
       addAddress({
         ...data,
         userId: user?.id || '1',
-        isDefault: mockAddresses.length === 0
+        isDefault: userAddresses.length === 0
       });
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
     }
     
     setShowForm(false);
@@ -116,8 +97,8 @@ export const AddressManagement: React.FC = () => {
   };
 
   const setAsDefault = (addressId: string) => {
-    // Update all addresses to not be default
-    mockAddresses.forEach(addr => {
+    // Update all user addresses to not be default
+    userAddresses.forEach(addr => {
       updateAddress(addr.id, { isDefault: addr.id === addressId });
     });
   };
@@ -129,7 +110,7 @@ export const AddressManagement: React.FC = () => {
           alert(`Location detected: ${position.coords.latitude}, ${position.coords.longitude}`);
           // In a real app, you would reverse geocode these coordinates
         },
-        (error) => {
+        () => {
           alert('Unable to detect location. Please enter manually.');
         }
       );
@@ -161,6 +142,24 @@ export const AddressManagement: React.FC = () => {
             Add New Address
           </Button>
         </div>
+
+        {/* Success Message */}
+        {showSuccessMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3"
+          >
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <div>
+              <p className="text-green-800 font-medium">
+                {editingAddress ? 'Address updated successfully!' : 'Address added successfully!'}
+              </p>
+              <p className="text-green-600 text-sm">Your address has been saved.</p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Add/Edit Address Form */}
         {showForm && (
@@ -274,7 +273,7 @@ export const AddressManagement: React.FC = () => {
 
         {/* Addresses List */}
         <div className="space-y-4">
-          {mockAddresses.map((address, index) => (
+          {userAddresses.map((address, index) => (
             <motion.div
               key={address.id}
               initial={{ opacity: 0, y: 20 }}
@@ -344,7 +343,7 @@ export const AddressManagement: React.FC = () => {
           ))}
         </div>
 
-        {mockAddresses.length === 0 && (
+        {userAddresses.length === 0 && (
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
               <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />

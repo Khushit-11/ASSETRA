@@ -20,7 +20,10 @@ import {
   HelpCircle,
   X,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Globe,
+  Building,
+  Check
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -41,6 +44,23 @@ export const OwnerAccount: React.FC = () => {
     marketingEmails: false
   });
 
+  // Profile form state
+  const [profileData, setProfileData] = useState({
+    fullName: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '+91 9876543210',
+    country: 'india',
+    city: 'Mumbai',
+    pincode: '400001',
+    landmark: 'Near Central Mall',
+    addressLine1: '123 Main Street',
+    addressLine2: 'Apartment 4B',
+    addressLine3: 'Bandra West',
+    bio: 'Experienced rental business owner with a passion for providing quality products and excellent customer service.'
+  });
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   // Handle navigation from dashboard
   useEffect(() => {
     if (location.state?.activeSection) {
@@ -53,6 +73,38 @@ export const OwnerAccount: React.FC = () => {
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  // Profile form handlers
+  const handleProfileChange = (field: string, value: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSavingProfile(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Here you would typically make an API call to save the profile data
+      console.log('Saving profile data:', profileData);
+      
+      // Show success message
+      setShowSuccessMessage(true);
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Error saving profile. Please try again.');
+    } finally {
+      setIsSavingProfile(false);
+    }
   };
 
   // FAQ Data
@@ -334,122 +386,210 @@ export const OwnerAccount: React.FC = () => {
                   <h3 className="text-xl font-semibold text-gray-900">Profile Information</h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="John Doe"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="email"
-                        defaultValue="john.doe@example.com"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
+                {/* Success Message */}
+                {showSuccessMessage && (
+                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center space-x-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-green-800 font-medium">Profile updated successfully!</p>
+                      <p className="text-green-600 text-sm">Your changes have been saved.</p>
                     </div>
                   </div>
+                )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type="tel"
-                        defaultValue="+91 9876543210"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Location
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                {/* Basic Information */}
+                <div className="mb-8">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">Basic Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Full Name
+                      </label>
                       <input
                         type="text"
-                        defaultValue="Mumbai, India"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        value={profileData.fullName}
+                        onChange={(e) => handleProfileChange('fullName', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="email"
+                          value={profileData.email}
+                          onChange={(e) => handleProfileChange('email', e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="tel"
+                          value={profileData.phone}
+                          onChange={(e) => handleProfileChange('phone', e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        User Type
+                      </label>
+                      <div className="relative">
+                        <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="text"
+                          value="Owner"
+                          disabled
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Address Information */}
+                <div className="mb-8">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">Address Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Country
+                      </label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <select
+                          value={profileData.country}
+                          onChange={(e) => handleProfileChange('country', e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        >
+                          <option value="india">India</option>
+                          <option value="usa">United States</option>
+                          <option value="uk">United Kingdom</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        City
+                      </label>
+                      <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="text"
+                          value={profileData.city}
+                          onChange={(e) => handleProfileChange('city', e.target.value)}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Pincode
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.pincode}
+                        onChange={(e) => handleProfileChange('pincode', e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Landmark (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.landmark}
+                        onChange={(e) => handleProfileChange('landmark', e.target.value)}
+                        placeholder="Near..."
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-1 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Address Line 1
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.addressLine1}
+                        onChange={(e) => handleProfileChange('addressLine1', e.target.value)}
+                        placeholder="House/Flat number, Street name"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Address Line 2 (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.addressLine2}
+                        onChange={(e) => handleProfileChange('addressLine2', e.target.value)}
+                        placeholder="Area, Locality"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Address Line 3 (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={profileData.addressLine3}
+                        onChange={(e) => handleProfileChange('addressLine3', e.target.value)}
+                        placeholder="District"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Additional Information */}
+                <div className="mb-8">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">Additional Information</h4>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address Line 1
+                      Bio
                     </label>
-                    <input
-                      type="text"
-                      defaultValue="123 Main Street"
+                    <textarea
+                      rows={4}
+                      value={profileData.bio}
+                      onChange={(e) => handleProfileChange('bio', e.target.value)}
+                      placeholder="Tell us about yourself and your rental business..."
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address Line 2
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="Apartment 4B"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="Mumbai"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Pincode
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="400001"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bio
-                  </label>
-                  <textarea
-                    rows={4}
-                    defaultValue="Experienced rental business owner with a passion for providing quality products and excellent customer service."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  />
                 </div>
 
                 <div className="mt-6 flex justify-end">
-                  <button className="flex items-center space-x-2 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+                  <button 
+                    onClick={handleSaveProfile}
+                    disabled={isSavingProfile}
+                    className="flex items-center space-x-2 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed transition-colors"
+                  >
                     <Save className="w-4 h-4" />
-                    <span>Save Changes</span>
+                    <span>{isSavingProfile ? 'Saving...' : 'Save Changes'}</span>
                   </button>
                 </div>
               </Card>

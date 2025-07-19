@@ -71,11 +71,38 @@ const mockNotifications: Notification[] = [
   }
 ];
 
+const mockAddresses: Address[] = [
+  {
+    id: '1',
+    userId: '1',
+    label: 'Home',
+    country: 'India',
+    city: 'Mumbai',
+    pincode: '400001',
+    addressLine1: '123 Main Street',
+    addressLine2: 'Near Central Mall',
+    landmark: 'Opposite Metro Station',
+    isDefault: true
+  },
+  {
+    id: '2',
+    userId: '1',
+    label: 'Office',
+    country: 'India',
+    city: 'Mumbai',
+    pincode: '400051',
+    addressLine1: '456 Business Park',
+    addressLine2: 'Tower A, Floor 12',
+    landmark: 'Next to Coffee Shop',
+    isDefault: false
+  }
+];
+
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [rentalRequests, setRentalRequests] = useState<RentalRequest[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>(mockAddresses);
 
   const addProduct = (product: Omit<Product, 'id' | 'createdAt'>) => {
     const newProduct: Product = {
