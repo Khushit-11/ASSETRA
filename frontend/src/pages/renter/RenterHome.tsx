@@ -719,13 +719,49 @@ export const RenterHome: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold text-gray-900 mb-4">Most Rented Items</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['Gaming Chair', 'WiFi Router', 'Projector', 'Sound System'].map((item, index) => (
-              <Card key={item} className="p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
-                <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                  <Package className="w-8 h-8 text-gray-400" />
+            {[
+              {
+                name: 'Gaming Chair',
+                price: 100,
+                image: 'https://images.pexels.com/photos/7862610/pexels-photo-7862610.jpeg'
+              },
+              {
+                name: 'WiFi Router',
+                price: 200,
+                image: 'https://images.pexels.com/photos/4219861/pexels-photo-4219861.jpeg'
+              },
+              {
+                name: 'Projector',
+                price: 300,
+                image: 'https://images.pexels.com/photos/2226458/pexels-photo-2226458.jpeg'
+              },
+              {
+                name: 'Sound System',
+                price: 400,
+                image: 'https://images.pexels.com/photos/3642618/pexels-photo-3642618.jpeg'
+              }
+            ].map((item) => (
+              <Card key={item.name} className="p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                <div className="w-16 h-16 bg-gray-100 rounded-lg mx-auto mb-2 overflow-hidden">
+                  <img 
+                    src={item.image} 
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.parentElement?.querySelector('.fallback-icon');
+                      if (fallback) {
+                        (fallback as HTMLElement).style.display = 'flex';
+                      }
+                    }}
+                  />
+                  <div className="fallback-icon w-full h-full hidden items-center justify-center">
+                    <Package className="w-8 h-8 text-gray-400" />
+                  </div>
                 </div>
-                <p className="text-sm font-medium text-gray-900">{item}</p>
-                <p className="text-xs text-gray-500">From ₹{(index + 1) * 100}/day</p>
+                <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                <p className="text-xs text-gray-500">From ₹{item.price}/day</p>
               </Card>
             ))}
           </div>
