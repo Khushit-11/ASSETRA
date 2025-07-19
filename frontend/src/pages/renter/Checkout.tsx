@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RenterLayout } from '../../components/renter/RenterLayout';
 import { Card } from '../../components/common/Layout';
 import { Button } from '../../components/common/Button';
@@ -11,7 +12,9 @@ import {
   Banknote,
   Check,
   Plus,
-  Edit
+  Edit,
+  CheckCircle,
+  X
 } from 'lucide-react';
 
 export const Checkout: React.FC = () => {
@@ -23,6 +26,7 @@ export const Checkout: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState('1');
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const addresses = [
     {
@@ -60,17 +64,18 @@ export const Checkout: React.FC = () => {
 
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
+    
+    // Show success modal immediately after short processing
     setTimeout(() => {
       setIsProcessing(false);
-      navigate('/renter/order-success', {
-        state: {
-          orderId: 'ORD' + Date.now(),
-          products,
-          address: addresses.find(a => a.id === selectedAddress),
-          paymentMethod: paymentMethods.find(p => p.id === paymentMethod)
-        }
-      });
-    }, 2000);
+      setShowSuccessModal(true);
+      
+      // Auto close modal and navigate to home page after 3 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        navigate('/renter/home');
+      }, 3000);
+    }, 1000);
   };
 
   const totalAmount = products.reduce(
@@ -279,6 +284,79 @@ export const Checkout: React.FC = () => {
 
         <div className="h-20 lg:hidden"></div>
       </div>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+              onClick={() => setShowSuccessModal(false)}
+            >
+              {/* Modal */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: "spring", duration: 0.4 }}
+                className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Success Icon */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", duration: 0.6 }}
+                  className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+                >
+                  <CheckCircle className="w-12 h-12 text-green-600" />
+                </motion.div>
+
+                {/* Success Message */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-center"
+                >
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                    Thank You!
+                  </h2>
+                  <p className="text-lg text-gray-700 mb-2">
+                    Your order has been placed successfully
+                  </p>
+                  <p className="text-sm text-gray-500 mb-6">
+                    You will be redirected to the home page shortly
+                  </p>
+                </motion.div>
+
+                {/* Close Button */}
+                <motion.button
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  onClick={() => setShowSuccessModal(false)}
+                  className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
+
+                {/* Progress Indicator */}
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 3 }}
+                  className="h-1 bg-blue-600 rounded-full mt-4"
+                />
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </RenterLayout>
   );
 };
