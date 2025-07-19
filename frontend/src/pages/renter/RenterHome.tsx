@@ -5,6 +5,7 @@ import { RenterLayout } from '../../components/renter/RenterLayout';
 import { Chatbot } from '../../components/renter/Chatbot';
 import { Card } from '../../components/common/Layout';
 import { Button } from '../../components/common/Button';
+import { useData } from '../../contexts/DataContext';
 import { 
   Search, 
   Smartphone, 
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export const RenterHome: React.FC = () => {
+  const { products } = useData();
   const [showChat, setShowChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -142,26 +144,31 @@ export const RenterHome: React.FC = () => {
     }
   ];
 
-  const aiRecommendations = [
-    {
-      id: '4',
-      title: 'Coffee Machine',
-      price: '₹150/day',
-      category: 'Home Appliances',
-      image: 'https://images.pexels.com/photos/4224694/pexels-photo-4224694.jpeg',
-      reason: 'Perfect for your morning routine',
-      securityDeposit: 3000
-    },
-    {
-      id: '5',
-      title: 'Exercise Bike',
-      price: '₹200/day',
-      category: 'Fitness',
-      image: 'https://images.pexels.com/photos/4046719/pexels-photo-4046719.jpeg',
-      reason: 'Great for home workouts',
-      securityDeposit: 4000
-    }
-  ];
+  // Category mapping from backend values to display labels
+  const categoryMapping: Record<string, string> = {
+    'electronics': 'Electronics',
+    'home-appliances': 'Home Appliances',
+    'clothing': 'Clothing',
+    'fitness': 'Fitness',
+    'furniture': 'Furniture',
+    'tools': 'Tools'
+  };
+
+  // Transform products from DataContext into recommendation format
+  const aiRecommendations = useMemo(() => {
+    return products
+      .filter(product => product.status === 'available' && product.availableQuantity > 0)
+      .slice(0, 6) // Limit to first 6 available products
+      .map(product => ({
+        id: product.id,
+        title: product.title,
+        price: `₹${product.rentPrice}/day`,
+        category: categoryMapping[product.category] || product.category,
+        image: product.images[0] || 'https://images.pexels.com/photos/4224694/pexels-photo-4224694.jpeg',
+        reason: 'Available for rent',
+        securityDeposit: product.securityAmount
+      }));
+  }, [products]);
 
   // Combine all searchable items
   const allSearchableItems = useMemo(() => [
@@ -189,7 +196,7 @@ export const RenterHome: React.FC = () => {
       category: product.category,
       productData: product
     }))
-  ], []);
+  ], [aiRecommendations]);
 
   // Filter products based on search or category selection
   const filteredProducts = useMemo(() => {
@@ -223,7 +230,7 @@ export const RenterHome: React.FC = () => {
     }
     
     return aiRecommendations;
-  }, [activeFilter, activeCategory, searchQuery]);
+  }, [activeFilter, activeCategory, searchQuery, aiRecommendations]);
 
   // Search function
   useEffect(() => {
