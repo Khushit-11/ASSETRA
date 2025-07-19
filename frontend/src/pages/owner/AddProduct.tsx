@@ -182,7 +182,9 @@ export const AddProduct: React.FC = () => {
       }
       
       if (descriptionMatch && descriptionMatch[1]) {
-        setValue('description', descriptionMatch[1].trim());
+        // Remove all asterisks (*) from the generated description
+        const cleanedDescription = descriptionMatch[1].trim().replace(/\*/g, '');
+        setValue('description', cleanedDescription);
       }
     } catch (error) {
       alert('Failed to generate content. Please try again.');

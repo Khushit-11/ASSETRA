@@ -17,7 +17,10 @@ import {
   ArrowLeft,
   Key,
   LogOut,
-  HelpCircle
+  HelpCircle,
+  X,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -28,6 +31,8 @@ export const OwnerAccount: React.FC = () => {
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [activeSection, setActiveSection] = useState<AccountSection>(null);
+  const [showFAQ, setShowFAQ] = useState(false);
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -48,6 +53,90 @@ export const OwnerAccount: React.FC = () => {
       [key]: !prev[key]
     }));
   };
+
+  // FAQ Data
+  const faqData = [
+    {
+      question: "How do I list an item for rent?",
+      answer: "Go to your dashboard, click 'Add Product,' fill in the details (photos, description, pricing, availability), and submit. Once approved, your item will be live."
+    },
+    {
+      question: "What types of items can I rent out?",
+      answer: "You can rent out almost anything—electronics, furniture, tools, vehicles, sports gear, etc., as long as it complies with our Prohibited Items Policy."
+    },
+    {
+      question: "How do I set rental pricing?",
+      answer: "You decide the daily/weekly/monthly rate. Check similar listings for competitive pricing. You can also offer discounts for longer rentals."
+    },
+    {
+      question: "Can I reject a rental request?",
+      answer: "Yes, you can decline requests if the renter doesn't meet your criteria or if the item is unavailable."
+    },
+    {
+      question: "How do I handle security deposits?",
+      answer: "You can require a refundable deposit. The platform can hold it securely and release it back to the renter after the item is returned undamaged."
+    },
+    {
+      question: "What if my item gets damaged?",
+      answer: "Renters are responsible for damages. You can file a claim through our resolution center, and we'll help mediate the issue."
+    },
+    {
+      question: "How are payments processed?",
+      answer: "Payments are securely processed through the platform. You'll receive payouts (minus service fees) after the rental period ends."
+    },
+    {
+      question: "When do I get paid?",
+      answer: "Payouts are released within 2-3 business days after the rental ends, depending on your bank."
+    },
+    {
+      question: "Can I meet the renter before handing over the item?",
+      answer: "Yes, you can arrange a meet-up or verify the renter's ID for security."
+    },
+    {
+      question: "How do I handle late returns?",
+      answer: "You can charge extra fees for late returns. Set your policy in the listing, and the platform will enforce it."
+    },
+    {
+      question: "Can I edit my listing after posting?",
+      answer: "Yes, you can update availability, pricing, or descriptions anytime from your dashboard."
+    },
+    {
+      question: "How do I increase my chances of getting rentals?",
+      answer: "High-quality photos, detailed descriptions, competitive pricing, and good reviews help attract renters."
+    },
+    {
+      question: "What if a renter doesn't return my item?",
+      answer: "Report it immediately. We assist in recovery efforts and may compensate you if the renter is unresponsive."
+    },
+    {
+      question: "Are there any fees for listing items?",
+      answer: "Listing is free, but we charge a service fee (e.g., 10-15%) on completed rentals."
+    },
+    {
+      question: "How do I cancel a confirmed booking?",
+      answer: "Go to 'My Bookings,' select the rental, and cancel (excessive cancellations may affect your ranking)."
+    },
+    {
+      question: "Can I rent out items long-term?",
+      answer: "Yes! You can set monthly rates and negotiate long-term deals with renters."
+    },
+    {
+      question: "How do I handle insurance for my rented items?",
+      answer: "We recommend checking if your homeowner's/renter's insurance covers rentals. Some items may require additional coverage."
+    },
+    {
+      question: "What happens if a renter claims the item wasn't as described?",
+      answer: "We mediate disputes. Provide clear photos and descriptions to avoid misunderstandings."
+    },
+    {
+      question: "Can I block certain renters?",
+      answer: "Yes, you can block users with poor ratings or suspicious activity."
+    },
+    {
+      question: "How do I delete my listing?",
+      answer: "Go to 'My Listings,' select the item, and click 'Deactivate' or 'Delete.'"
+    }
+  ];
 
   const mockTransactions = [
     { id: 1, date: '2024-01-15', description: 'Rental payment - DSLR Camera', amount: 1500, type: 'credit' },
@@ -714,7 +803,10 @@ export const OwnerAccount: React.FC = () => {
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div 
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      onClick={() => setShowFAQ(true)}
+                    >
                       <h4 className="font-medium text-gray-900 mb-2">Frequently Asked Questions</h4>
                       <p className="text-sm text-gray-600">Find answers to common questions about your account and rentals.</p>
                     </div>
@@ -754,6 +846,69 @@ export const OwnerAccount: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* FAQ Modal */}
+      {showFAQ && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <HelpCircle className="w-6 h-6 text-emerald-600" />
+                <h2 className="text-2xl font-bold text-gray-900">Frequently Asked Questions</h2>
+              </div>
+              <button
+                onClick={() => setShowFAQ(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="space-y-4">
+                {faqData.map((faq, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg">
+                    <button
+                      className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                    >
+                      <h3 className="font-medium text-gray-900 pr-4">{faq.question}</h3>
+                      {expandedFAQ === index ? (
+                        <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                      )}
+                    </button>
+                    {expandedFAQ === index && (
+                      <div className="px-4 pb-4">
+                        <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Contact Support Section */}
+              <div className="mt-8 p-6 bg-emerald-50 rounded-lg">
+                <h3 className="font-semibold text-emerald-900 mb-2">Still need help?</h3>
+                <p className="text-emerald-700 mb-4">
+                  Can't find what you're looking for? Our support team is here to help you.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+                    Contact Support
+                  </button>
+                  <button className="px-4 py-2 border border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors">
+                    Email us at support@assetra.com
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </OwnerLayout>
   );
 };

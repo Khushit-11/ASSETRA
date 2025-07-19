@@ -12,7 +12,6 @@ import {
   Eye,
   Plus,
   Users,
-  TrendingUp,
   ArrowRight
 } from 'lucide-react';
 
@@ -118,13 +117,6 @@ export const OwnerDashboard: React.FC = () => {
       icon: Users,
       color: 'bg-blue-500',
       path: '/owner/rental-requests'
-    },
-    {
-      title: 'Analytics',
-      description: 'Check performance metrics',
-      icon: TrendingUp,
-      color: 'bg-purple-500',
-      path: '/owner/analytics'
     }
   ];
 

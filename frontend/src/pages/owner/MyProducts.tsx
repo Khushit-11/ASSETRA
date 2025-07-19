@@ -11,6 +11,7 @@ export const MyProducts: React.FC = () => {
   const { products, updateProduct, deleteProduct } = useData();
   const [filter, setFilter] = useState('all');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -29,14 +30,16 @@ export const MyProducts: React.FC = () => {
     navigate('/owner/add-product', { state: { editProduct: products.find(p => p.id === productId) } });
   };
 
-  const handleViewImage = (imageUrl: string) => {
+  const handleViewImage = (imageUrl: string, product: any) => {
     setSelectedImage(imageUrl);
+    setSelectedProduct(product);
     setIsImageModalOpen(true);
   };
 
   const closeImageModal = () => {
     setIsImageModalOpen(false);
     setSelectedImage(null);
+    setSelectedProduct(null);
   };
 
   const handleDelete = (productId: string) => {
@@ -147,7 +150,7 @@ export const MyProducts: React.FC = () => {
                       Edit
                     </Button>
                     <Button
-                      onClick={() => handleViewImage(product.images[0])}
+                      onClick={() => handleViewImage(product.images[0], product)}
                       variant="secondary"
                       size="sm"
                     >
@@ -195,14 +198,14 @@ export const MyProducts: React.FC = () => {
         )}
       </div>
 
-      {/* Image Modal */}
-      {isImageModalOpen && selectedImage && (
+      {/* Enhanced Image and Details Modal */}
+      {isImageModalOpen && selectedImage && selectedProduct && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
           onClick={closeImageModal}
         >
           <div 
-            className="relative max-w-4xl max-h-full bg-white rounded-lg overflow-hidden"
+            className="relative max-w-6xl max-h-[90vh] bg-white rounded-lg overflow-hidden flex"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -213,12 +216,89 @@ export const MyProducts: React.FC = () => {
               <X className="w-6 h-6 text-gray-800" />
             </button>
 
-            {/* Image */}
-            <img
-              src={selectedImage}
-              alt="Product"
-              className="w-full h-auto max-h-screen object-contain"
-            />
+            {/* Left side - Image */}
+            <div className="flex-1 min-w-0">
+              <img
+                src={selectedImage}
+                alt={selectedProduct.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Right side - Product Details */}
+            <div className="w-96 bg-gray-50 p-6 overflow-y-auto">
+              <div className="space-y-4">
+                {/* Product Title and Status */}
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                    {selectedProduct.title}
+                  </h2>
+                  <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                    statusColors[selectedProduct.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {selectedProduct.status}
+                  </span>
+                </div>
+
+                {/* Pricing */}
+                <div className="bg-white p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-lg font-bold text-emerald-600">
+                      ₹{selectedProduct.rentPrice}/day
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      Security: ₹{selectedProduct.securityAmount}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Available: {selectedProduct.availableQuantity}/{selectedProduct.quantity}
+                  </div>
+                </div>
+
+                {/* Full Description */}
+                <div className="bg-white p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
+                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                    {selectedProduct.description}
+                  </p>
+                </div>
+
+                {/* Category */}
+                <div className="bg-white p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2">Category</h3>
+                  <span className="inline-flex px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    {selectedProduct.category}
+                  </span>
+                </div>
+
+                {/* Location */}
+                {selectedProduct.location && (
+                  <div className="bg-white p-4 rounded-lg">
+                    <h3 className="font-semibold text-gray-900 mb-2">Location</h3>
+                    <p className="text-gray-700 text-sm">{selectedProduct.location}</p>
+                  </div>
+                )}
+
+                {/* Additional Details */}
+                <div className="bg-white p-4 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-2">Details</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Product ID:</span>
+                      <span className="text-gray-900">{selectedProduct.id}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Total Quantity:</span>
+                      <span className="text-gray-900">{selectedProduct.quantity}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Available:</span>
+                      <span className="text-gray-900">{selectedProduct.availableQuantity}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
