@@ -32,6 +32,7 @@ export const OwnerAccount: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeSection, setActiveSection] = useState<AccountSection>(null);
   const [showFAQ, setShowFAQ] = useState(false);
+  const [showUserGuide, setShowUserGuide] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
@@ -811,19 +812,12 @@ export const OwnerAccount: React.FC = () => {
                       <p className="text-sm text-gray-600">Find answers to common questions about your account and rentals.</p>
                     </div>
 
-                    <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                      <h4 className="font-medium text-gray-900 mb-2">Contact Support</h4>
-                      <p className="text-sm text-gray-600">Get in touch with our support team for personalized help.</p>
-                    </div>
-
-                    <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <div 
+                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      onClick={() => setShowUserGuide(true)}
+                    >
                       <h4 className="font-medium text-gray-900 mb-2">User Guide</h4>
                       <p className="text-sm text-gray-600">Learn how to make the most of your Assetra account.</p>
-                    </div>
-
-                    <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                      <h4 className="font-medium text-gray-900 mb-2">Report an Issue</h4>
-                      <p className="text-sm text-gray-600">Let us know if you're experiencing any problems.</p>
                     </div>
                   </div>
 
@@ -903,6 +897,196 @@ export const OwnerAccount: React.FC = () => {
                   <button className="px-4 py-2 border border-emerald-600 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors">
                     Email us at support@assetra.com
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Guide Modal */}
+      {showUserGuide && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <HelpCircle className="w-6 h-6 text-emerald-600" />
+                <h2 className="text-2xl font-bold text-gray-900">Owner's User Guide</h2>
+              </div>
+              <button
+                onClick={() => setShowUserGuide(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <div className="prose max-w-none">
+                <p className="text-lg text-gray-600 mb-8">
+                  Welcome to Assetra, where you can earn money by renting out your unused items! This guide will help you get started.
+                </p>
+
+                {/* Section 1 */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">1. Creating Your Account</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">1</div>
+                      <div>
+                        <p className="font-medium text-gray-900">Sign Up:</p>
+                        <p className="text-gray-700">Register using your email or social media account.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">2</div>
+                      <div>
+                        <p className="font-medium text-gray-900">Verify Your Identity:</p>
+                        <p className="text-gray-700">Complete profile verification for trust and security.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="w-6 h-6 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">3</div>
+                      <div>
+                        <p className="font-medium text-gray-900">Set Up Payout Method:</p>
+                        <p className="text-gray-700">Add your bank account or digital wallet to receive payments.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2 */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">2. Listing Your Item for Rent</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="border-l-4 border-emerald-500 pl-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Step 1: Click "Add New Product"</h4>
+                      <p className="text-gray-700">Go to your Dashboard → Click "Add Product."</p>
+                    </div>
+
+                    <div className="border-l-4 border-emerald-500 pl-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Step 2: Fill in Item Details</h4>
+                      <ul className="list-disc list-inside text-gray-700 space-y-1">
+                        <li>Title & Description: Be clear and detailed (e.g., "Canon EOS R5 Camera – 4K Video, 45MP").</li>
+                        <li>Category: Select the right category (e.g., Electronics, Tools, Furniture).</li>
+                        <li>Upload High-Quality Photos: Show different angles and any wear/tear.</li>
+                        <li>Set Pricing: Choose daily/weekly/monthly rates.</li>
+                      </ul>
+                    </div>
+
+                    <div className="border-l-4 border-emerald-500 pl-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Step 3: Set Rental Terms</h4>
+                      <ul className="list-disc list-inside text-gray-700 space-y-1">
+                        <li>Availability Calendar: Mark when the item is free.</li>
+                        <li>Security Deposit: Optional, but recommended for high-value items.</li>
+                        <li>Late Fees: Define charges for overdue returns.</li>
+                        <li>Pickup/Delivery Options: Choose if you'll deliver or require pickup.</li>
+                      </ul>
+                    </div>
+
+                    <div className="border-l-4 border-emerald-500 pl-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Step 4: Publish Your Listing</h4>
+                      <p className="text-gray-700">Submit for review. Once approved, your item goes live!</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3 */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">3. Managing Rental Requests</h3>
+                  <div className="bg-blue-50 p-4 rounded-lg space-y-2">
+                    <p className="text-gray-700"><span className="font-medium">Accept/Reject Requests:</span> Check renter profiles and ratings before confirming.</p>
+                    <p className="text-gray-700"><span className="font-medium">Communicate via In-App Chat:</span> Discuss pickup/drop-off details securely.</p>
+                    <p className="text-gray-700"><span className="font-medium">Confirm Booking:</span> Once agreed, the renter pays, and the booking is secured.</p>
+                  </div>
+                </div>
+
+                {/* Section 4 */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">4. Handing Over the Item</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-yellow-50 p-4 rounded-lg">
+                      <p className="font-medium text-gray-900 mb-2">Safety First</p>
+                      <p className="text-gray-700 text-sm">Meet in a Safe Location (or use a secure locker if available).</p>
+                    </div>
+                    <div className="bg-yellow-50 p-4 rounded-lg">
+                      <p className="font-medium text-gray-900 mb-2">Document Everything</p>
+                      <p className="text-gray-700 text-sm">Inspect the Item Together: Note any existing damages (take photos if needed).</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                    <p className="font-medium text-gray-900 mb-2">Provide Instructions</p>
+                    <p className="text-gray-700">Explain how to use the item (if necessary).</p>
+                  </div>
+                </div>
+
+                {/* Section 5 */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">5. After the Rental Ends</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-sm">1</div>
+                      <p className="text-gray-700">Check for Damages: Compare the item's condition before and after.</p>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm">2</div>
+                      <p className="text-gray-700">Release Security Deposit (if applicable): Refund if no issues.</p>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm">3</div>
+                      <p className="text-gray-700">Leave a Review: Rate the renter to help the community.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 6 */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">6. Getting Paid</h3>
+                  <div className="bg-emerald-50 p-4 rounded-lg space-y-2">
+                    <p className="text-gray-700"><span className="font-medium">Payout Timeline:</span> Funds are released 2-3 business days after rental completion.</p>
+                    <p className="text-gray-700"><span className="font-medium">View Earnings:</span> Check your Transaction History in the dashboard.</p>
+                  </div>
+                </div>
+
+                {/* Section 7 */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">7. Safety & Dispute Resolution</h3>
+                  <div className="bg-red-50 p-4 rounded-lg space-y-2">
+                    <p className="text-gray-700">Report Issues Immediately if the item is damaged, lost, or not returned.</p>
+                    <p className="text-gray-700">Our Support Team will mediate disputes fairly.</p>
+                  </div>
+                </div>
+
+                {/* Tips Section */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Additional Tips for Success</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-purple-50 p-4 rounded-lg text-center">
+                      <p className="font-medium text-purple-900 mb-2">Stay Updated</p>
+                      <p className="text-purple-700 text-sm">Keep your calendar updated to avoid double bookings.</p>
+                    </div>
+                    <div className="bg-blue-50 p-4 rounded-lg text-center">
+                      <p className="font-medium text-blue-900 mb-2">Be Responsive</p>
+                      <p className="text-blue-700 text-sm">Respond quickly to rental requests for better rankings.</p>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg text-center">
+                      <p className="font-medium text-green-900 mb-2">Offer Discounts</p>
+                      <p className="text-green-700 text-sm">Offer discounts for longer rentals to attract more renters.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Need Help Section */}
+                <div className="bg-gray-100 p-6 rounded-lg">
+                  <h3 className="font-semibold text-gray-900 mb-3">Need Help?</h3>
+                  <div className="space-y-2">
+                    <p className="text-gray-700">Visit our Help Center for more detailed guides</p>
+                    <p className="text-gray-700">Contact our support team at support@assetra.com</p>
+                    <p className="text-gray-700">Call us at +91 1800-123-4567</p>
+                  </div>
                 </div>
               </div>
             </div>
