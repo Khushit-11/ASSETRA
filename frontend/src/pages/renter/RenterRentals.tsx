@@ -82,7 +82,8 @@ export const RenterRentals: React.FC = () => {
     'out-for-delivery': { label: 'Out for Delivery', color: 'bg-yellow-100 text-yellow-800', icon: Truck },
     'delivered': { label: 'Delivered', color: 'bg-emerald-100 text-emerald-800', icon: Package },
     'rented': { label: 'In Use', color: 'bg-purple-100 text-purple-800', icon: CheckCircle },
-    'return-scheduled': { label: 'Return Scheduled', color: 'bg-orange-100 text-orange-800', icon: RotateCcw }
+    'return-scheduled': { label: 'Return Scheduled', color: 'bg-orange-100 text-orange-800', icon: RotateCcw },
+    'return-initialized': { label: 'Return Initialized', color: 'bg-indigo-100 text-indigo-800', icon: CheckCircle }
   };
 
   const filteredRentals = rentals.filter(rental => {
@@ -140,6 +141,15 @@ export const RenterRentals: React.FC = () => {
         rating,
         comments
       });
+
+      // Update the rental status to 'return-initialized'
+      setRentals(prevRentals => 
+        prevRentals.map(rental => 
+          rental.id === selectedRental 
+            ? { ...rental, status: 'return-initialized' }
+            : rental
+        )
+      );
 
       // Close modal and show success message
       setShowReturnModal(false);
