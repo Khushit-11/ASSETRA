@@ -5,10 +5,8 @@ import { Heart, Minus, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Cart: React.FC = () => {
-  const { cart, removeFromCart, addToWishlist, addToCart } = useCart();
+  const { cart, removeFromCart, addToWishlist, addToCart, wishlist } = useCart();
   const navigate = useNavigate();
-  // Track wishlist state locally for heart color
-  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
 
   // Helper to increment quantity
   const increment = (item: any) => {
@@ -24,11 +22,11 @@ const Cart: React.FC = () => {
   // Wishlist toggle
   const handleWishlist = (item: any) => {
     addToWishlist(item);
-    setWishlistIds((prev) =>
-      prev.includes(item.id)
-        ? prev.filter((id) => id !== item.id)
-        : [...prev, item.id]
-    );
+  };
+
+  // Check if item is in wishlist
+  const isInWishlist = (itemId: string) => {
+    return wishlist.some(item => item.id === itemId);
   };
 
   // Calculate total cost
@@ -194,7 +192,8 @@ const Cart: React.FC = () => {
                       Remove
                     </Button>
                     <Button size="sm" variant="secondary" onClick={() => handleWishlist(item)}>
-                      <Heart className={`w-4 h-4 mr-1 ${wishlistIds.includes(item.id) ? 'text-red-500 fill-red-500' : ''}`} /> Add to Wishlist
+                      <Heart className={`w-4 h-4 mr-1 ${isInWishlist(item.id) ? 'text-red-500 fill-red-500' : ''}`} /> 
+                      {isInWishlist(item.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
                     </Button>
                   </div>
                 </div>

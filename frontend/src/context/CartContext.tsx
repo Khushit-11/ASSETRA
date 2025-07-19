@@ -17,9 +17,11 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
+  wishlist: CartItem[];
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   addToWishlist: (item: CartItem) => void;
+  removeFromWishlist: (id: string) => void;
 }
 
 
@@ -33,6 +35,7 @@ export const useCart = () => {
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<CartItem[]>([]);
 
   const addToCart = (item: CartItem) => {
     setCart(prev => {
@@ -50,14 +53,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCart(prev => prev.filter(item => item.id !== id));
   };
 
-  // Placeholder for wishlist logic
   const addToWishlist = (item: CartItem) => {
-    // Implement wishlist logic here
-    alert(`${item.name} added to wishlist!`);
+    setWishlist(prev => {
+      const existing = prev.find(wi => wi.id === item.id);
+      if (existing) {
+        // Item already in wishlist, remove it
+        return prev.filter(wi => wi.id !== item.id);
+      }
+      // Add to wishlist
+      return [...prev, { ...item, quantity: 1 }];
+    });
+  };
+
+  const removeFromWishlist = (id: string) => {
+    setWishlist(prev => prev.filter(item => item.id !== id));
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, addToWishlist }}>
+    <CartContext.Provider value={{ cart, wishlist, addToCart, removeFromCart, addToWishlist, removeFromWishlist }}>
       {children}
     </CartContext.Provider>
   );

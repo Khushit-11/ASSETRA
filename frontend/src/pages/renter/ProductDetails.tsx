@@ -22,50 +22,214 @@ import { useCart } from '../../context/CartContext';
 export const ProductDetails: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, addToWishlist, wishlist } = useCart();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showRentModal, setShowRentModal] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedDuration, setSelectedDuration] = useState(1);
 
-  // Mock product data
-  const product = {
-    id: productId,
-    title: 'Professional DSLR Camera',
-    description: 'High-quality Canon EOS R5 with 24-105mm lens. Perfect for professional photography, events, and creative projects. Includes camera bag, extra batteries, and memory cards.',
-    price: 500,
-    originalPrice: 25000,
-    images: [
-      'https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg',
-      'https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg',
-      'https://images.pexels.com/photos/225157/pexels-photo-225157.jpeg'
-    ],
-    rating: 4.8,
-    reviewCount: 124,
-    location: '2.5 km away',
-    available: true,
-    securityDeposit: 5000,
-    owner: {
-      name: 'John Doe',
-      rating: 4.9,
-      totalRentals: 89,
-      phone: '+91 9876543210'
+  // Products data (should match the data from RenterHome)
+  const products = [
+    {
+      id: '1',
+      title: 'Professional DSLR Camera',
+      description: 'High-quality Canon EOS R5 with 24-105mm lens. Perfect for professional photography, events, and creative projects. Includes camera bag, extra batteries, and memory cards.',
+      price: 500,
+      originalPrice: 25000,
+      category: 'Electronics',
+      images: [
+        'https://images.pexels.com/photos/90946/pexels-photo-90946.jpeg',
+        'https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg',
+        'https://images.pexels.com/photos/225157/pexels-photo-225157.jpeg'
+      ],
+      rating: 4.8,
+      reviewCount: 124,
+      location: '2.5 km away',
+      available: true,
+      securityDeposit: 5000,
+      owner: {
+        name: 'John Doe',
+        rating: 4.9,
+        totalRentals: 89,
+        phone: '+91 9876543210'
+      },
+      features: [
+        '24-105mm lens included',
+        'Extra batteries provided',
+        'Memory cards included',
+        'Camera bag provided',
+        'Professional grade'
+      ],
+      specifications: {
+        brand: 'Canon',
+        model: 'EOS R5',
+        type: 'Mirrorless Camera',
+        condition: 'Excellent'
+      }
     },
-    features: [
-      '24-105mm lens included',
-      'Extra batteries provided',
-      'Memory cards included',
-      'Camera bag provided',
-      'Professional grade'
-    ],
-    specifications: {
-      brand: 'Canon',
-      model: 'EOS R5',
-      type: 'Mirrorless Camera',
-      condition: 'Excellent'
+    {
+      id: '2',
+      title: 'Gaming Laptop',
+      description: 'High-performance Dell Alienware laptop perfect for gaming, video editing, and professional work. Features RGB keyboard and comes with gaming mouse.',
+      price: 800,
+      originalPrice: 45000,
+      category: 'Electronics',
+      images: [
+        'https://images.pexels.com/photos/205421/pexels-photo-205421.jpeg'
+      ],
+      rating: 4.9,
+      reviewCount: 89,
+      location: '1.2 km away',
+      available: true,
+      securityDeposit: 5000,
+      owner: {
+        name: 'Jane Smith',
+        rating: 4.8,
+        totalRentals: 120,
+        phone: '+91 9876543211'
+      },
+      features: [
+        'High performance CPU',
+        'RGB keyboard included',
+        'Gaming mouse included',
+        'High refresh rate display',
+        'Professional grade cooling'
+      ],
+      specifications: {
+        brand: 'Dell',
+        model: 'Alienware',
+        type: 'Gaming Laptop',
+        condition: 'Excellent'
+      }
+    },
+    {
+      id: '3',
+      title: 'Home Theater System',
+      description: 'Sony HT-S700RF surround sound system perfect for movie nights and entertainment. Features Bluetooth connectivity and crystal clear audio.',
+      price: 300,
+      originalPrice: 15000,
+      category: 'Home Appliances',
+      images: [
+        'https://images.pexels.com/photos/1884581/pexels-photo-1884581.jpeg'
+      ],
+      rating: 4.7,
+      reviewCount: 45,
+      location: '3.1 km away',
+      available: true,
+      securityDeposit: 3000,
+      owner: {
+        name: 'Sam Lee',
+        rating: 4.7,
+        totalRentals: 60,
+        phone: '+91 9876543212'
+      },
+      features: [
+        'Surround sound system',
+        'Bluetooth connectivity',
+        'Remote included',
+        'Multiple input options',
+        'Easy setup'
+      ],
+      specifications: {
+        brand: 'Sony',
+        model: 'HT-S700RF',
+        type: 'Home Theater',
+        condition: 'Excellent'
+      }
+    },
+    {
+      id: '4',
+      title: 'Coffee Machine',
+      description: 'Premium coffee machine perfect for home or office use. Makes delicious espresso, cappuccino, and regular coffee with ease.',
+      price: 150,
+      originalPrice: 8000,
+      category: 'Home Appliances',
+      images: [
+        'https://images.pexels.com/photos/4224694/pexels-photo-4224694.jpeg'
+      ],
+      rating: 4.6,
+      reviewCount: 32,
+      location: '1.8 km away',
+      available: true,
+      securityDeposit: 3000,
+      owner: {
+        name: 'Mike Johnson',
+        rating: 4.6,
+        totalRentals: 45,
+        phone: '+91 9876543213'
+      },
+      features: [
+        'Multiple coffee types',
+        'Easy to use',
+        'Auto-clean function',
+        'Milk frother included',
+        'Timer function'
+      ],
+      specifications: {
+        brand: 'De\'Longhi',
+        model: 'EC685M',
+        type: 'Coffee Machine',
+        condition: 'Excellent'
+      }
+    },
+    {
+      id: '5',
+      title: 'Exercise Bike',
+      description: 'High-quality exercise bike perfect for home workouts. Features adjustable resistance, digital display, and comfortable seating.',
+      price: 200,
+      originalPrice: 12000,
+      category: 'Fitness',
+      images: [
+        'https://images.pexels.com/photos/4046719/pexels-photo-4046719.jpeg'
+      ],
+      rating: 4.5,
+      reviewCount: 28,
+      location: '2.3 km away',
+      available: true,
+      securityDeposit: 4000,
+      owner: {
+        name: 'Sarah Wilson',
+        rating: 4.5,
+        totalRentals: 38,
+        phone: '+91 9876543214'
+      },
+      features: [
+        'Adjustable resistance',
+        'Digital display',
+        'Comfortable seating',
+        'Heart rate monitor',
+        'Compact design'
+      ],
+      specifications: {
+        brand: 'Schwinn',
+        model: 'IC4',
+        type: 'Exercise Bike',
+        condition: 'Excellent'
+      }
     }
-  };
+  ];
+
+  // Find the product based on productId
+  const product = products.find(p => p.id === productId);
+
+  // If product not found, show error or redirect
+  if (!product) {
+    return (
+      <RenterLayout>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
+            <p className="text-gray-600 mb-6">The product you're looking for doesn't exist.</p>
+            <Button onClick={() => navigate('/renter')}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      </RenterLayout>
+    );
+  }
 
   const calculateTotal = () => {
     const days = selectedDuration;
@@ -76,6 +240,28 @@ export const ProductDetails: React.FC = () => {
 
   const handleRentNow = () => {
     setShowRentModal(true);
+  };
+
+  // Wishlist functionality
+  const isInWishlist = () => {
+    return wishlist.some(item => item.id === product.id);
+  };
+
+  const handleWishlistToggle = () => {
+    const cartItem = {
+      id: product.id,
+      name: product.title,
+      image: product.images[0],
+      price: product.price,
+      quantity: 1,
+      securityDeposit: product.securityDeposit,
+      owner: {
+        name: product.owner.name,
+        rating: product.owner.rating,
+        phone: product.owner.phone
+      }
+    };
+    addToWishlist(cartItem);
   };
 
   const handleRentSubmit = () => {
@@ -132,8 +318,13 @@ export const ProductDetails: React.FC = () => {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex space-x-2">
-            <button className="p-2 rounded-lg hover:bg-gray-100">
-              <Heart className="w-5 h-5" />
+            <button 
+              onClick={handleWishlistToggle}
+              className={`p-2 rounded-lg hover:bg-gray-100 ${
+                isInWishlist() ? 'text-red-500' : 'text-gray-600'
+              }`}
+            >
+              <Heart className={`w-5 h-5 ${isInWishlist() ? 'fill-current' : ''}`} />
             </button>
             <button className="p-2 rounded-lg hover:bg-gray-100">
               <Share2 className="w-5 h-5" />
