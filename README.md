@@ -5,7 +5,7 @@
 # Assetra: The AI-Powered Rental Platform 
 
 ## Sub-theme
-**Smart Rentals for Bharat – Empowering Ownership, Access & Employment via AI **
+Smart Rentals for Bharat – Empowering Ownership, Access & Employment via AI 
 
 ---
 
