@@ -160,3 +160,8 @@ Our AI-powered approach maximizes item utilization, ensuring products are effici
 
 ---
 
+## License
+
+This project is licensed under the **MIT License**.
+
+---
