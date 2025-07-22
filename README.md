@@ -2,7 +2,7 @@
   <img src="frontend/src/pages/image-7.png" alt="Assetra Logo" width="100" />
 </p>
 
-# Assetra: The AI-Powered Rental Platform 🚀
+# Assetra: The AI-Powered Rental Platform 
 
 ## Sub-theme
 **Smart Rentals for Bharat – Empowering Ownership, Access & Employment via AI 🏡🎯**
